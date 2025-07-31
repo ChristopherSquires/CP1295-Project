@@ -19,13 +19,14 @@ export class Note {
      * @param {number} options.y - Y position on the board
      * @param {string} options.color - CSS class for note color
      */
-    constructor({ id = null, content = '', x = 0, y = 0, color = null }) {
+    constructor({ id = null, content = '', x = 0, y = 0, color = null, timestamp = new Date().toLocaleString() }) {
         this.id = id || this.generateId();
         this.content = content;
         this.x = x;
         this.y = y;
         this.color = color || this.getRandomColor();
         this.element = null;
+        this.timestamp = timestamp;
     }
 
     /**
@@ -58,6 +59,10 @@ export class Note {
         noteElement.classList.add(this.color);
         noteElement.style.left = `${this.x}px`;
         noteElement.style.top = `${this.y}px`;
+
+        // Set the timestamp
+        const timestampElement = noteElement.querySelector('.note-timestamp');
+        timestampElement.textContent = `${this.timestamp}`;
         
         // Set content
         const contentElement = noteElement.querySelector('.note-content');
