@@ -66,7 +66,7 @@ export class Note {
         
         // Set content
         const contentElement = noteElement.querySelector('.note-content');
-        contentElement.textContent = this.content;
+        contentElement.innerHTML = this.content;
         
         // Store reference to the element
         this.element = noteElement;
@@ -97,7 +97,7 @@ export class Note {
         
         if (this.element) {
             const contentElement = this.element.querySelector('.note-content');
-            contentElement.textContent = content;
+            contentElement.innerHTML = content;
         }
     }
 

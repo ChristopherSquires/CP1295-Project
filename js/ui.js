@@ -13,6 +13,8 @@ import { saveNotes, exportNotesAsJson } from './storage.js';
 export function initializeUI(noteManager) {
     const noteBoard = document.getElementById('note-board');
     const exportBtn = document.getElementById('export-btn');
+    const ascendBtn = document.getElementById('ascend-btn');
+    const descendBtn = document.getElementById('descend-btn');
 
     // Double click on board to create a new note
     noteBoard.addEventListener('dblclick', (event) => {
@@ -26,6 +28,16 @@ export function initializeUI(noteManager) {
     exportBtn.addEventListener('click', () => {
         exportNotes(noteManager);
     });
+    
+    // Ascending sort click handler
+    ascendBtn.addEventListener('click', () => {
+        notesAscend(noteManager);
+    });
+
+    // Descending sort click handler
+    descendBtn.addEventListener('click', () => {
+        notesDescend(noteManager);
+    })
 
     // Setup auto-save timer
     setupAutoSave(noteManager);
@@ -82,6 +94,7 @@ export function setupNoteEventListeners(noteElement, note, noteManager) {
     const contentElement = noteElement.querySelector('.note-content');
     const deleteButton = noteElement.querySelector('.delete-btn');
     const quoteButton = noteElement.querySelector('.quote-btn');
+    const imageButton = noteElement.querySelector('.image-btn');
     
     // Track whether the note is being dragged
     let isDragging = false;
@@ -89,7 +102,7 @@ export function setupNoteEventListeners(noteElement, note, noteManager) {
     
     // Content change handler
     contentElement.addEventListener('input', () => {
-        note.updateContent(contentElement.textContent);
+        note.updateContent(contentElement.innerHTML);
     });
     
     // Delete button handler
@@ -113,6 +126,19 @@ export function setupNoteEventListeners(noteElement, note, noteManager) {
             // Display error in console
             console.error('Failed to fetch quote:', error);
         }
+    });
+
+    // Image button handler
+    imageButton.addEventListener('click', () => {
+        const img = document.createElement('img');
+        img.src = 'images/Incineroar.webp';
+        img.alt = 'QuickNotes Image';
+        img.style.maxWidth = '100%';
+        img.style.display = 'block';
+        img.style.marginTop = '5px';
+
+        contentElement.appendChild(img);
+        note.updateContent(contentElement.innerHTML);
     });
     
     // Drag start
@@ -186,6 +212,58 @@ export function deleteNote(noteElement, note, noteManager) {
         // Remove from manager
         noteManager.removeNote(note.id);
     });
+}
+
+// Sort by ascending
+function notesAscend(noteManager) {
+    const noteBoard = document.getElementById('note-board');
+    const notes = noteManager.getAllNotes();
+    notes.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+    noteBoard.innerHTML = "";
+
+    let x = 10;
+    let y = 10;
+    const noteHeight = 200;
+    const noteWidth = 200;
+    const maxWidth = window.innerWidth;
+
+    notes.forEach(note => {
+        if (note.element) {
+            if (x + noteWidth > noteHeight) {
+                x = 10;
+                y += noteHeight + 10;
+            }
+            note.updatePosition(x, y);
+            noteBoard.appendChild(note.element);
+        }
+        x += noteWidth + 10;
+    })
+}
+
+// Sort by descending
+function notesDescend(noteManager) {
+    const noteBoard = document.getElementById('note-board');
+    const notes = noteManager.getAllNotes();
+    notes.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    noteBoard.innerHTML = "";
+
+    let x = 10;
+    let y = 10;
+    const noteHeight = 200;
+    const noteWidth = 200;
+    const maxWidth = window.innerWidth;
+
+    notes.forEach(note => {
+        if (note.element) {
+            if (x + noteWidth > noteHeight) {
+                x = 10;
+                y += noteHeight + 10;
+            }
+            note.updatePosition(x, y);
+            noteBoard.appendChild(note.element);
+        }
+        x += noteWidth + 10;
+    })
 }
 
 /**
